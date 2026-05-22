@@ -45,15 +45,7 @@
       align-items: center;
     }
 
-    h1 {
-      font-family: 'Impact', sans-serif;
-      color: #e6d7a8;
-      text-shadow: 0 0 15px #b8942e;
-      font-size: 2.6rem;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      text-align: center;
-    }
+    h1 { font-family: 'Impact', sans-serif; color: #e6d7a8; text-shadow: 0 0 15px #b8942e; font-size: 2.6rem; margin-bottom: 8px; text-transform: uppercase; text-align: center; }
 
     .aura-score {
       background: #0a0c09;
@@ -69,14 +61,7 @@
     .aura-label { color: #ddc07a; font-weight: bold; font-size: 1.35rem; }
     .aura-value { font-size: 3.4rem; font-weight: 800; color: #f9e076; text-shadow: 0 0 25px #ffb300; }
 
-    .tom-area {
-      position: relative;
-      cursor: pointer;
-      margin: 12px 0 8px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
+    .tom-area { position: relative; cursor: pointer; margin: 12px 0 8px; width: 100%; display: flex; justify-content: center; }
     .tom-area:active { transform: scale(0.95); }
 
     .tom-image {
@@ -88,8 +73,7 @@
 
     .cigar-smoke-container {
       position: absolute;
-      top: 35%;
-      right: 15%;
+      top: 35%; right: 15%;
       pointer-events: none;
       z-index: 5;
     }
@@ -99,23 +83,14 @@
     .smoke:nth-child(3) { animation-delay: 1.1s; font-size: 1.6rem; }
 
     @keyframes floatSmoke {
-      0%   { transform: translate(0,0) scale(0.7); opacity: 0.85; }
-      50%  { transform: translate(18px,-32px) scale(1.55); opacity: 0.45; }
+      0% { transform: translate(0,0) scale(0.7); opacity: 0.85; }
+      50% { transform: translate(18px,-32px) scale(1.55); opacity: 0.45; }
       100% { transform: translate(38px,-58px) scale(2.1); opacity: 0; }
     }
 
-    .bob-squad {
-      display: flex;
-      gap: 18px;
-      margin: 25px 0 22px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+    .bob-squad { display: flex; gap: 18px; margin: 25px 0 22px; flex-wrap: wrap; justify-content: center; }
     .creepy-face {
-      width: 92px;
-      height: 92px;
-      border-radius: 18px;
-      object-fit: cover;
+      width: 92px; height: 92px; border-radius: 18px; object-fit: cover;
       box-shadow: 0 12px 25px rgba(0,0,0,0.7);
       animation: march 0.85s infinite alternate ease-in-out;
       border: 3px solid #2d2a1c;
@@ -125,7 +100,7 @@
     .creepy-face:nth-child(4) { animation-delay: 0.42s; }
 
     @keyframes march {
-      0%   { transform: translateY(0) rotate(-3deg); }
+      0% { transform: translateY(0) rotate(-3deg); }
       100% { transform: translateY(-12px) rotate(3deg); }
     }
 
@@ -138,6 +113,17 @@
       padding: 8px 24px;
       border-radius: 30px;
       font-family: 'Impact', sans-serif;
+    }
+
+    .music-btn {
+      margin-top: 10px;
+      padding: 10px 22px;
+      background: rgba(70,60,30,0.9);
+      border: 1px solid #c9a53b;
+      color: #f7e5a1;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1.05rem;
     }
 
     .reset-btn {
@@ -163,14 +149,13 @@
 
     <div class="tom-area" id="tomClickZone">
       <img class="tom-image" src="photo_2026-05-23_02-07-52.jpg" alt="Tom">
-      
       <div class="cigar-smoke-container">
         <span class="smoke">💨</span><span class="smoke">💨</span><span class="smoke">💨</span>
         <span class="cigar">🚬</span>
       </div>
     </div>
 
-    <div class="click-hint"> YARA YARA YA </div>
+    <div class="click-hint">⚡ КЛИКАЙ ПО ТОМУ ⚡</div>
 
     <div class="bob-squad">
       <img class="creepy-face" src="photo_2026-05-23_02-07-47.jpg" alt="bob">
@@ -179,28 +164,37 @@
       <img class="creepy-face" src="photo_2026-05-23_02-07-47.jpg" alt="bob">
     </div>
 
-    <button class="reset-btn" id="resetButton"> Сбросить ауру</button>
+    <button class="music-btn" id="musicBtn">🎵 Yara Yara Ya Phonk</button>
+    <button class="reset-btn" id="resetButton">🔄 Сбросить ауру</button>
   </div>
+
+  <audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/audio/2024/05/28/audio_8f8e0e3e3f.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="clickSound">
+    <source src="https://freesound.org/data/previews/66/66930_931655-lq.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
     let aura = 0;
+    let musicStarted = false;
     const auraDisplay = document.getElementById('auraDisplay');
     const tomZone = document.getElementById('tomClickZone');
+    const musicBtn = document.getElementById('musicBtn');
     const resetBtn = document.getElementById('resetButton');
+    const bgMusic = document.getElementById('bgMusic');
+    const clickSound = document.getElementById('clickSound');
 
-    // Загрузка сохранённой ауры
+    let musicOn = true;
+
     try {
       const saved = localStorage.getItem('farmAuraYara');
       if (saved) aura = parseInt(saved);
     } catch(e){}
 
-    function updateDisplay() {
-      auraDisplay.textContent = aura;
-    }
-
-    function saveAura() {
-      try { localStorage.setItem('farmAuraYara', aura); } catch(e){}
-    }
+    function updateDisplay() { auraDisplay.textContent = aura; }
+    function saveAura() { try { localStorage.setItem('farmAuraYara', aura); } catch(e){} }
 
     function addAura() {
       aura++;
@@ -208,36 +202,37 @@
       saveAura();
       auraDisplay.style.transform = 'scale(1.25)';
       setTimeout(() => auraDisplay.style.transform = 'scale(1)', 140);
+
+      clickSound.currentTime = 0;
+      clickSound.play().catch(() => {});
+
+      // Первый клик — запускаем музыку
+      if (!musicStarted) {
+        musicStarted = true;
+        bgMusic.play().catch(() => {});
+      }
     }
 
-    function resetAura() {
+    tomZone.addEventListener('click', addAura);
+
+    musicBtn.addEventListener('click', () => {
+      musicOn = !musicOn;
+      if (musicOn) {
+        bgMusic.play();
+        musicBtn.textContent = '🎵 Yara Yara Ya: ON';
+      } else {
+        bgMusic.pause();
+        musicBtn.textContent = '🎵 Yara Yara Ya: OFF';
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
       aura = 0;
       updateDisplay();
       saveAura();
-    }
-
-    tomZone.addEventListener('click', (e) => {
-      addAura();
-      // Эффект +1
-      const plus = document.createElement('div');
-      plus.textContent = '+1';
-      plus.style.position = 'absolute';
-      plus.style.left = (e.offsetX || 100) + 'px';
-      plus.style.top = (e.offsetY || 100) + 'px';
-      plus.style.color = '#f9e076';
-      plus.style.fontSize = '2rem';
-      plus.style.fontWeight = 'bold';
-      plus.style.pointerEvents = 'none';
-      plus.style.animation = 'floatPlus 0.9s forwards';
-      tomZone.appendChild(plus);
-      setTimeout(() => plus.remove(), 900);
     });
 
-    const style = document.createElement('style');
-    style.textContent = `@keyframes floatPlus { 0% {opacity:1; transform:translateY(0)} 100% {opacity:0; transform:translateY(-60px) scale(1.6)} }`;
-    document.head.appendChild(style);
-
-    resetBtn.addEventListener('click', resetAura);
+    // Показываем, что нужно кликнуть
     updateDisplay();
   </script>
 </body>
