@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
+  <title>Фарм аура</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1a1e1b 0%, #2d3329 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      padding: 20px;
+      margin: 0;
+      position: relative;
+      box-shadow: inset 0 0 150px rgba(0,0,0,0.7);
+    }
+
+    /* дымный фон */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 40%, rgba(200, 200, 200, 0.08) 0%, transparent 60%),
+                  radial-gradient(circle at 70% 60%, rgba(180, 180, 180, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .game-container {
+      position: relative;
+      z-index: 10;
+      max-width: 750px;
+      width: 100%;
+      background: rgba(20, 20, 17, 0.75);
+      backdrop-filter: blur(18px);
+      border-radius: 70px 70px 50px 50px;
+      padding: 25px 30px 35px;
+      box-shadow: 0 35px 70px rgba(0,0,0,0.8), inset 0 2px 10px rgba(255,255,200,0.3);
+      border: 1px solid rgba(210, 180, 80, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    h1 {
+      font-family: 'Impact', 'Arial Black', 'Franklin Gothic Heavy', sans-serif;
+      color: #e6d7a8;
+      text-shadow: 0 0 15px #b8942e, 0 4px 8px black;
+      letter-spacing: 6px;
+      font-size: 3.2rem;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      word-break: break-word;
+    }
+    h1 span {
+      font-size: 2.5rem;
+      color: #c9a53b;
+    }
+
+    .aura-score {
+      background: #0a0c09;
+      border: 2px solid #c9a53b;
+      border-radius: 60px;
+      padding: 12px 28px;
+      margin: 10px 0 20px;
+      box-shadow: 0 0 30px #b8860b;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .aura-label {
+      color: #ddc07a;
+      font-weight: bold;
+      letter-spacing: 2px;
+      font-size: 1.4rem;
+      font-family: 'Impact', 'Arial Black', sans-serif;
+    }
+    .aura-value {
+      font-size: 3.8rem;
+      font-weight: 800;
+      color: #f9e076;
+      text-shadow: 0 0 25px #ffb300;
+      line-height: 1;
+    }
+
+    /* Том — кликабельная зона */
+    .tom-area {
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      margin: 15px 0 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .tom-area:active {
+      transform: scale(0.96);
+    }
+    .tom-figure {
+      font-size: 8rem;
+      filter: drop-shadow(0 20px 15px #000000aa) drop-shadow(0 0 15px #f0b300);
+      transition: 0.2s;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Вместо эмодзи кота — текстовый персонаж Том (по запросу "вместо тома вставь этого") */
+    .tom-character {
+      font-size: 7rem;
+      font-weight: bold;
+      color: #4a3f2c;
+      background: linear-gradient(180deg, #d4b68a 0%, #b39264 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 3px 3px 0 #3b2e1e, 6px 6px 0 rgba(0,0,0,0.3);
+      letter-spacing: 2px;
+      display: inline-block;
+      transform: scaleX(-1);
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      line-height: 1;
+      filter: drop-shadow(0 10px 10px black);
+    }
+    /* кепка как у острых козырьков */
+    .tom-head {
+      position: relative;
+      display: inline-block;
+    }
+    .tom-head::after {
+      content: "🧢";
+      position: absolute;
+      top: -55px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-5deg);
+      font-size: 4.8rem;
+      filter: drop-shadow(0 10px 8px black);
+      color: #2d2d2d;
+      text-shadow: 0 0 6px #5a5a5a;
+      z-index: 5;
+    }
+    /* сигара и дым */
+    .cigar-smoke-container {
+      position: absolute;
+      top: 10px;
+      right: -25px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      pointer-events: none;
+    }
+    .cigar {
+      font-size: 3.2rem;
+      transform: rotate(-15deg);
+      filter: drop-shadow(0 4px 4px black);
+      margin-right: -8px;
+      display: inline-block;
+      color: #b87c4b;
+      text-shadow: 0 0 8px orange;
+    }
+    .smoke-stream {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .smoke {
+      font-size: 2rem;
+      opacity: 0.7;
+      animation: floatSmoke 2.8s infinite ease-in-out;
+      filter: blur(1px);
+      color: #d6d6d6;
+    }
+    .smoke:nth-child(1) { animation-delay: 0s; }
+    .smoke:nth-child(2) { animation-delay: 0.6s; font-size: 2.2rem; }
+    .smoke:nth-child(3) { animation-delay: 1.2s; font-size: 1.8rem; opacity: 0.5; }
+
+    @keyframes floatSmoke {
+      0% { transform: translate(0, 0) scale(0.8); opacity: 0.8; }
+      50% { transform: translate(20px, -26px) scale(1.6); opacity: 0.4; }
+      100% { transform: translate(42px, -52px) scale(2.2); opacity: 0; }
+    }
+
+    .click-hint {
+      color: #f5e7b3;
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-top: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 6px 22px;
+      border-radius: 30px;
+      letter-spacing: 2px;
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      text-transform: uppercase;
+      backdrop-filter: blur(5px);
+    }
+
+    /* марширующие бобы (без square pants, лица заменены) */
+    .bob-squad {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 22px;
+      margin: 30px 0 20px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .bob {
+      font-size: 4.5rem;
+      animation: march 0.9s infinite alternate ease-in-out;
+      filter: drop-shadow(0 14px 10px #000000b0);
+      position: relative;
+      display: inline-block;
+      background: transparent;
+    }
+    /* тело губки (без штанов) и лицо заменено (текстовое представление) */
+    .bob-body {
+      display: inline-block;
+      position: relative;
+      font-weight: bold;
+      color: #f7e55c;
+      background: #e0b040;
+      background: linear-gradient(180deg, #f7d44a 10%, #c9922c 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 2px 2px 0 #7b5e1a;
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      letter-spacing: 1px;
+    }
+    /* лица губок бобов заменены (вместо лиц – другие) */
+    .bob-face {
+      position: absolute;
+      left: 10px;
+      top: -5px;
+      font-size: 2.5rem;
+      color: #2e2b1f;
+      text-shadow: 0 0 5px white;
+      font-family: 'Arial', sans-serif;
+      font-weight: bold;
+    }
+
+    @keyframes march {
+      0% { transform: translateY(0px) rotate(-2deg); }
+      100% { transform: translateY(-10px) rotate(2deg); }
+    }
+    .bob:nth-child(2) { animation-delay: 0.15s; }
+    .bob:nth-child(3) { animation-delay: 0.3s; }
+    .bob:nth-child(4) { animation-delay: 0.45s; }
+
+    .bob-caption {
+      color: #eedb8b;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 6px;
+      background: #2d2a1c;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-weight: bold;
+    }
+
+    .reset-btn {
+      background: #3e3a2b;
+      border: none;
+      color: #f7e5a1;
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 12px 28px;
+      border-radius: 40px;
+      margin-top: 20px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      background: rgba(70, 60, 30, 0.7);
+      border: 1px solid #c9a53b;
+      transition: 0.25s;
+      letter-spacing: 1px;
+      box-shadow: 0 5px 15px black;
+      font-family: 'Impact', 'Arial Black', sans-serif;
+    }
+    .reset-btn:hover {
+      background: #b4943c;
+      color: black;
+      box-shadow: 0 0 25px gold;
+      border-color: white;
+    }
+
+    
+    .tom-image {
+      width: 260px;
+      border-radius: 25px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+    }
+
+    .creepy-face {
+      width: 110px;
+      height: 110px;
+      border-radius: 18px;
+      object-fit: cover;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      animation: march 0.9s infinite alternate ease-in-out;
+    }
+
+
+    @media (max-width: 500px) {
+      .tom-character { font-size: 4.5rem; }
+      .bob { font-size: 3.2rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="game-container">
+  <h1>
+    <span>🥃</span> ФАРМ АУРА <span>🚬</span>
+  </h1>
+  <div class="aura-score">
+    <span class="aura-label">АУРА</span>
+    <span class="aura-value" id="auraDisplay">0</span>
+  </div>
+
+  
+  <div class="tom-area" id="tomClickZone">
+    <img class="tom-image" src="photo_2026-05-23_02-07-52.jpg" alt="Tom">
+    <div class="click-hint">ФАРМ АУРА</div>
+  </div>
+
+    </div>
+    <div class="click-hint">⚡ ФАРМ АУРА YARA YARA YA ⚡</div>
+  </div>
+
+  
+  <div class="bob-squad">
+    <img class="creepy-face" src="photo_2026-05-23_02-07-47.jpg" alt="face">
+    <img class="creepy-face" src="photo_2026-05-23_02-07-47.jpg" alt="face">
+    <img class="creepy-face" src="photo_2026-05-23_02-07-47.jpg" alt="face">
+    <img class="creepy-face" src="photo_2026-05-23_02-07-47.jpg" alt="face">
+  </div>
+
+  <button
+ class="reset-btn" id="resetButton">🔄 Сбросить ауру</button>
+  <!-- удалена строка "по клику +1 аура | стиль Томми" -->
+</div>
+
+<script>
+  (function() {
+    let aura = 0;
+    const auraDisplay = document.getElementById('auraDisplay');
+    const tomZone = document.getElementById('tomClickZone');
+    const resetBtn = document.getElementById('resetButton');
+
+    try {
+      const saved = localStorage.getItem('farmAuraYara');
+      if (saved !== null) {
+        const parsed = parseInt(saved, 10);
+        if (!isNaN(parsed) && parsed >= 0) {
+          aura = parsed;
+        }
+      }
+    } catch (e) {}
+    
+    function updateDisplay() {
+      auraDisplay.textContent = aura;
+    }
+
+    function saveAura() {
+      try {
+        localStorage.setItem('farmAuraYara', aura);
+      } catch (e) {}
+    }
+
+    function addAura(amount = 1) {
+      aura += amount;
+      updateDisplay();
+      saveAura();
+      auraDisplay.style.transform = 'scale(1.2)';
+      setTimeout(() => { auraDisplay.style.transform = 'scale(1)'; }, 120);
+    }
+
+    function resetAura() {
+      aura = 0;
+      updateDisplay();
+      saveAura();
+      auraDisplay.style.transform = 'scale(0.9)';
+      setTimeout(() => { auraDisplay.style.transform = 'scale(1)'; }, 150);
+    }
+
+    tomZone.addEventListener('click', (e) => {
+      addAura(1);
+      
+      const rect = tomZone.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const plusOne = document.createElement('div');
+      plusOne.textContent = '+1';
+      plusOne.style.position = 'absolute';
+      plusOne.style.left = x + 'px';
+      plusOne.style.top = y + 'px';
+      plusOne.style.color = '#f9e076';
+      plusOne.style.fontWeight = 'bold';
+      plusOne.style.fontSize = '1.8rem';
+      plusOne.style.textShadow = '0 0 15px black';
+      plusOne.style.pointerEvents = 'none';
+      plusOne.style.zIndex = '999';
+      plusOne.style.animation = 'floatPlus 0.9s ease-out forwards';
+      
+      tomZone.style.position = 'relative';
+      tomZone.appendChild(plusOne);
+      
+      setTimeout(() => {
+        if (plusOne.parentNode) plusOne.parentNode.removeChild(plusOne);
+      }, 900);
+    });
+
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = `
+      @keyframes floatPlus {
+        0% { opacity: 1; transform: translateY(0) scale(1); }
+        100% { opacity: 0; transform: translateY(-45px) scale(1.6); }
+      }
+      .aura-value { transition: transform 0.1s ease; }
+    `;
+    document.head.appendChild(styleSheet);
+
+    resetBtn.addEventListener('click', resetAura);
+    updateDisplay();
+  })();
+</script>
+</body>
+</html>
