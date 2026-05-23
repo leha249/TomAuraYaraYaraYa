@@ -69,30 +69,12 @@
     .aura-label { color: #ddc07a; font-weight: bold; font-size: 1.35rem; }
     .aura-value { font-size: 3.4rem; font-weight: 800; color: #f9e076; text-shadow: 0 0 25px #ffb300; }
 
-    .tom-area {
-      position: relative;
-      cursor: pointer;
-      margin: 12px 0 8px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
+    .tom-area { position: relative; cursor: pointer; margin: 12px 0 8px; width: 100%; display: flex; justify-content: center; }
     .tom-area:active { transform: scale(0.95); }
 
-    .tom-image {
-      width: 100%;
-      max-width: 280px;
-      border-radius: 25px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.75);
-    }
+    .tom-image { width: 100%; max-width: 280px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.75); }
 
-    .cigar-smoke-container {
-      position: absolute;
-      top: 35%;
-      right: 15%;
-      pointer-events: none;
-      z-index: 5;
-    }
+    .cigar-smoke-container { position: absolute; top: 35%; right: 15%; pointer-events: none; z-index: 5; }
     .cigar { font-size: 2.4rem; transform: rotate(-25deg); color: #b87c4b; }
     .smoke { font-size: 1.8rem; animation: floatSmoke 2.6s infinite ease-in-out; color: #d6d6d6; }
     .smoke:nth-child(2) { animation-delay: 0.5s; font-size: 2.1rem; }
@@ -104,25 +86,13 @@
       100% { transform: translate(38px,-58px) scale(2.1); opacity: 0; }
     }
 
-    .bob-squad {
-      display: flex;
-      gap: 18px;
-      margin: 25px 0 22px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+    .bob-squad { display: flex; gap: 18px; margin: 25px 0 22px; flex-wrap: wrap; justify-content: center; }
     .creepy-face {
-      width: 92px;
-      height: 92px;
-      border-radius: 18px;
-      object-fit: cover;
+      width: 92px; height: 92px; border-radius: 18px; object-fit: cover;
       box-shadow: 0 12px 25px rgba(0,0,0,0.7);
       animation: march 0.85s infinite alternate ease-in-out;
       border: 3px solid #2d2a1c;
     }
-    .creepy-face:nth-child(2) { animation-delay: 0.12s; }
-    .creepy-face:nth-child(3) { animation-delay: 0.28s; }
-    .creepy-face:nth-child(4) { animation-delay: 0.42s; }
 
     @keyframes march {
       0% { transform: translateY(0) rotate(-3deg); }
@@ -140,8 +110,8 @@
       font-family: 'Impact', sans-serif;
     }
 
-    .music-btn, .reset-btn {
-      margin-top: 10px;
+    button {
+      margin: 8px 5px;
       padding: 12px 28px;
       background: rgba(70,60,30,0.9);
       border: 1px solid #c9a53b;
@@ -169,7 +139,7 @@
       </div>
     </div>
 
-    <div class="click-hint">⚡ YARA YARA YA ⚡</div>
+    <div class="click-hint">YARA YARA YA </div>
 
     <div class="bob-squad">
       <img class="creepy-face" src="photo_2026-05-23_02-07-47.jpg" alt="bob">
@@ -178,8 +148,8 @@
       <img class="creepy-face" src="photo_2026-05-23_02-07-47.jpg" alt="bob">
     </div>
 
-    <button class="music-btn" id="musicBtn">🎵 Yara Yara Ya Phonk</button>
-    <button class="reset-btn" id="resetButton">🔄 Сбросить ауру</button>
+    <button id="musicBtn">Yara Yara Ya Phonk</button>
+    <button id="resetButton">Сбросить ауру</button>
   </div>
 
   <audio id="bgMusic" loop>
@@ -188,39 +158,35 @@
 
   <script>
     let aura = 0;
-    let musicStarted = false;
-
     const auraDisplay = document.getElementById('auraDisplay');
     const tomZone = document.getElementById('tomClickZone');
     const musicBtn = document.getElementById('musicBtn');
     const resetBtn = document.getElementById('resetButton');
     const bgMusic = document.getElementById('bgMusic');
 
-    // Загрузка ауры
+    let musicStarted = false;
+
+    // Загрузка
     function loadAura() {
       try {
         const saved = localStorage.getItem('farmAuraYara');
-        if (saved !== null) {
-          aura = parseInt(saved);
-        }
+        if (saved) aura = parseInt(saved);
       } catch(e) {}
       auraDisplay.textContent = aura;
     }
 
-    // Сохранение ауры
+    // Сохранение
     function saveAura() {
       try {
         localStorage.setItem('farmAuraYara', aura);
       } catch(e) {}
     }
 
-    // Сохранение при закрытии страницы
-    window.addEventListener('beforeunload', saveAura);
-
+    // Множественное сохранение для Chrome
     function addAura() {
       aura++;
       auraDisplay.textContent = aura;
-      saveAura(); // сохраняем сразу
+      saveAura();                    // сохраняем сразу
 
       auraDisplay.style.transform = 'scale(1.25)';
       setTimeout(() => auraDisplay.style.transform = 'scale(1)', 140);
@@ -232,6 +198,13 @@
     }
 
     tomZone.addEventListener('click', addAura);
+
+    // Дополнительное сохранение при уходе со страницы
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) saveAura();
+    });
+
+    window.addEventListener('pagehide', saveAura);
 
     musicBtn.addEventListener('click', () => {
       if (bgMusic.paused) {
@@ -251,7 +224,7 @@
       }
     });
 
-    // Загружаем ауру при открытии
+    // Инициализация
     loadAura();
   </script>
 </body>
