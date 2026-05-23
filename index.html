@@ -45,7 +45,15 @@
       align-items: center;
     }
 
-    h1 { font-family: 'Impact', sans-serif; color: #e6d7a8; text-shadow: 0 0 15px #b8942e; font-size: 2.6rem; margin-bottom: 8px; text-transform: uppercase; text-align: center; }
+    h1 {
+      font-family: 'Impact', sans-serif;
+      color: #e6d7a8;
+      text-shadow: 0 0 15px #b8942e;
+      font-size: 2.6rem;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      text-align: center;
+    }
 
     .aura-score {
       background: #0a0c09;
@@ -151,11 +159,11 @@
       <img class="tom-image" src="photo_2026-05-23_02-07-52.jpg" alt="Tom">
       <div class="cigar-smoke-container">
         <span class="smoke">💨</span><span class="smoke">💨</span><span class="smoke">💨</span>
-  
+        <span class="cigar">🚬</span>
       </div>
     </div>
 
-    <div class="click-hint"> КЛИКАЙ ПО ТОМУ </div>
+    <div class="click-hint">⚡ КЛИКАЙ ПО ТОМУ ⚡</div>
 
     <div class="bob-squad">
       <img class="creepy-face" src="photo_2026-05-23_02-07-47.jpg" alt="bob">
@@ -164,12 +172,13 @@
       <img class="creepy-face" src="photo_2026-05-23_02-07-47.jpg" alt="bob">
     </div>
 
-    <button class="music-btn" id="musicBtn"> Yara Yara Ya Phonk</button>
-    <button class="reset-btn" id="resetButton">Сбросить ауру</button>
+    <button class="music-btn" id="musicBtn">🎵 Yara Yara Ya Phonk</button>
+    <button class="reset-btn" id="resetButton">🔄 Сбросить ауру</button>
   </div>
 
+  <!-- Твоя музыка -->
   <audio id="bgMusic" loop>
-    <source src="https://cdn.pixabay.com/audio/2024/05/28/audio_8f8e0e3e3f.mp3" type="audio/mpeg">
+    <source src="MC_WM_-_Yara_Yara_Ya_Phonk_-_Sua_Amiga_Eu_Vou_Pegar_Slowed_81524797.mp3" type="audio/mpeg">
   </audio>
 
   <audio id="clickSound">
@@ -179,6 +188,7 @@
   <script>
     let aura = 0;
     let musicStarted = false;
+
     const auraDisplay = document.getElementById('auraDisplay');
     const tomZone = document.getElementById('tomClickZone');
     const musicBtn = document.getElementById('musicBtn');
@@ -206,7 +216,6 @@
       clickSound.currentTime = 0;
       clickSound.play().catch(() => {});
 
-      // Первый клик — запускаем музыку
       if (!musicStarted) {
         musicStarted = true;
         bgMusic.play().catch(() => {});
@@ -219,10 +228,10 @@
       musicOn = !musicOn;
       if (musicOn) {
         bgMusic.play();
-        musicBtn.textContent = ' Yara Yara Ya: ON';
+        musicBtn.textContent = '🎵 Yara Yara Ya: ON';
       } else {
         bgMusic.pause();
-        musicBtn.textContent = ' Yara Yara Ya: OFF';
+        musicBtn.textContent = '🎵 Yara Yara Ya: OFF';
       }
     });
 
@@ -232,7 +241,6 @@
       saveAura();
     });
 
-    // Показываем, что нужно кликнуть
     updateDisplay();
   </script>
 </body>
